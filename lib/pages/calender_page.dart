@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shuumy/components/ReportCard.dart';
 
 class CalenderPage extends StatefulWidget {
   @override
@@ -17,15 +18,25 @@ class _CalenderPageState extends State<CalenderPage> {
               Expanded(
                 flex: 1,
                 child: Container(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10, right: 5, bottom: 10, left: 10),
+                    child: Text('4/5'),
+                  ),
                   color: Colors.blue,
-                  child: Text('4/5'),
                 ),
               ),
               Expanded(
                 flex: 4,
                 child: Container(
+                  child: Padding(
+                    padding: EdgeInsets.only(top: 10, right: 5, bottom: 10, left: 10),
+                    child: ReportCard(
+                      title: 'hogetitle',
+                      memo: 'hogehoge',
+                      diaryDate: DateTime.now(),
+                    )
+                  ),
                   color: Colors.orange,
-                  child: Text('ここにやったことが表示される(Card)'),
                 ),
               ),
             ],
