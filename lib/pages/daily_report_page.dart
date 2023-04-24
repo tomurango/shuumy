@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shuumy/components/ReportCard.dart';
 
-class CalenderPage extends StatefulWidget {
+class DailyReportPage extends StatefulWidget {
   @override
-  State<CalenderPage> createState() => _CalenderPageState();
+  State<DailyReportPage> createState() => _DailyReportPageState();
 }
 
-class _CalenderPageState extends State<CalenderPage> {
+class _DailyReportPageState extends State<DailyReportPage> {
 
   @override
   Widget build(BuildContext context) {

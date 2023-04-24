@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shuumy/pages/calender_page.dart';
+import 'package:shuumy/pages/daily_report_page.dart';
 import 'package:shuumy/pages/challenge_page.dart';
 import 'package:shuumy/pages/setting_page.dart';
 
@@ -49,10 +49,10 @@ class _MainPagesState extends State<MainPages> {
   int selectedIndex = 0;
 
   // 切り替える画面のリスト
-  List<Widget> pages = [CalenderPage(), ChallengePage(), SettingPage()];
+  List<Widget> pages = [DailyReportPage(), ChallengePage(), SettingPage()];
 
   // 各ページのタイトルを格納するリスト
-  List<String> pageTitles = ['カレンダー', 'チャレンジ', '設定'];
+  List<String> pageTitles = ['日報', 'チャレンジ', '設定'];
 
   @override
   Widget build(BuildContext context) {
@@ -70,7 +70,7 @@ class _MainPagesState extends State<MainPages> {
       */
       bottomNavigationBar: BottomNavigationBar(
         items: [
-          BottomNavigationBarItem(icon: Icon(Icons.event), label: 'カレンダー'),
+          BottomNavigationBarItem(icon: Icon(Icons.event), label: '日報'),
           BottomNavigationBarItem(icon: Icon(Icons.payments), label: 'チャレンジ'),
           BottomNavigationBarItem(icon: Icon(Icons.settings), label: '設定'),
         ],
