@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shuumy/components/ReportCard.dart';
+import 'package:shuumy/components/report_card.dart';
 
 class DailyReportPage extends StatefulWidget {
   @override

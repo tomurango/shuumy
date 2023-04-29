@@ -2,10 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:shuumy/pages/daily_report_page.dart';
 import 'package:shuumy/pages/challenge_page.dart';
 import 'package:shuumy/pages/setting_page.dart';
+import 'package:shuumy/components/tutorial_dialog.dart'; 
 
 // firebase 関連ライブラリ
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+
+// その他ライブラリ
+import 'package:shared_preferences/shared_preferences.dart';
 
 
 void main() async{
@@ -87,5 +91,23 @@ class _MainPagesState extends State<MainPages> {
         fixedColor: Colors.red,
       ),
     );
+  }
+
+  // tutorial表示可否確認用
+  @override
+  void initState() {
+    super.initState();
+    _checkTutorialShown();
+  }
+
+  Future<void> _checkTutorialShown() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shown = prefs.getBool('tutorial_shown') ?? false;
+
+    if (!shown) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        TutorialDialog.show(context); // ここで直接呼び出す
+      });
+    }
   }
 }
