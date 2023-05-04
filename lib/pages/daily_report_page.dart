@@ -7,65 +7,43 @@ class DailyReportPage extends StatefulWidget {
 }
 
 class _DailyReportPageState extends State<DailyReportPage> {
-
   @override
   Widget build(BuildContext context) {
+    DateTime today = DateTime.now();
+    List<DateTime> pastDates = List.generate(
+      7,
+      (index) => today.subtract(Duration(days: index)),
+    );
+
     return SingleChildScrollView(
       child: Container(
         child: Column(
-          children: [
-            Row(
+          children: pastDates.map((date) {
+            bool isEditable = date.day == today.day ||
+                (date.day == today.subtract(Duration(days: 1)).day &&
+                    today.hour < 12);
+
+            return Row(
               children: [
                 Expanded(
                   flex: 1,
                   child: Container(
                     child: Padding(
-                      padding: EdgeInsets.only(top: 5, right: 0, bottom: 0, left: 5),
+                      padding:
+                          EdgeInsets.only(top: 5, right: 0, bottom: 0, left: 5),
                       child: Stack(
-                        alignment: AlignmentDirectional.center, // 子要素を中央に配置する
+                        alignment: AlignmentDirectional.center,
                         children: <Widget>[
-                          Container(
-                            color: Colors.teal,
-                            height: 56,
-                            width: 56,
-                          ),
-                          Text('4/6'),
-                        ]
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  flex: 4,
-                  child: Container(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 5, right: 5, bottom: 0, left: 0),
-                      child: ReportCard(
-                        title: 'hogetitle',
-                        memo: 'hogehoge',
-                        diaryDate: DateTime.now(),
-                      )
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 5, right: 0, bottom: 0, left: 5),
-                      child: Stack(
-                        alignment: AlignmentDirectional.center, // 子要素を中央に配置する
-                        children: <Widget>[
-                          Container(
-                            color: Colors.teal[200],
-                            height: 56,
-                            width: 56,
-                          ),
-                          Text('4/5'),
+                          isEditable
+                              ? Container(
+                                  color: date.day == today.day
+                                      ? Colors.teal
+                                      : Colors.teal[200],
+                                  height: 56,
+                                  width: 56,
+                                )
+                              : SizedBox(),
+                          Text('${date.month}/${date.day}'),
                         ],
                       ),
                     ),
@@ -75,49 +53,19 @@ class _DailyReportPageState extends State<DailyReportPage> {
                   flex: 4,
                   child: Container(
                     child: Padding(
-                      padding: EdgeInsets.only(top: 5, right: 5, bottom: 0, left: 0),
+                      padding:
+                          EdgeInsets.only(top: 5, right: 5, bottom: 0, left: 0),
                       child: ReportCard(
-                        title: 'hogetitle',
-                        memo: 'hogehoge',
-                        diaryDate: DateTime.now(),
-                      )
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Container(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 5, right: 0, bottom: 0, left: 5),
-                      child: Stack(
-                        alignment: AlignmentDirectional.center, // 子要素を中央に配置する
-                        children: <Widget>[
-                          Text('4/4'),
-                        ],
+                        title: 'Title for ${date.month}/${date.day}',
+                        memo: 'Memo for ${date.month}/${date.day}',
+                        diaryDate: date,
                       ),
                     ),
                   ),
                 ),
-                Expanded(
-                  flex: 4,
-                  child: Container(
-                    child: Padding(
-                      padding: EdgeInsets.only(top: 5, right: 5, bottom: 0, left: 0),
-                      child: ReportCard(
-                        title: 'hogetitle',
-                        memo: 'hogehoge',
-                        diaryDate: DateTime.now(),
-                      )
-                    ),
-                  ),
-                ),
               ],
-            ),
-          ],
+            );
+          }).toList(),
         ),
       ),
     );

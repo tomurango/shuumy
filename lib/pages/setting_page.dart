@@ -24,7 +24,13 @@ class _SettingPageState extends State<SettingPage> {
           },
         ),
         ListTile(
-          title: Text('チュートリアル確認'),
+          title: Text('チュートリアル再確認'),
+          onTap: () {
+            // チュートリアル確認画面へ遷移
+          },
+        ),
+        ListTile(
+          title: Text('チャレンジのルール詳細'),
           onTap: () {
             // チュートリアル確認画面へ遷移
           },

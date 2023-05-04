@@ -20,7 +20,7 @@ class _ChallengePageState extends State<ChallengePage> {
               // チャレンジ内容確認ボタンの処理をここに実装
             },
             child: Text(
-              'チャレンジとは？',
+              'チャレンジを始める',
               style: TextStyle(
                 color: Theme.of(context).primaryColor,
               ),
