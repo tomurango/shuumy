@@ -7,6 +7,50 @@ class DailyReportPage extends StatefulWidget {
 }
 
 class _DailyReportPageState extends State<DailyReportPage> {
+  
+  Future<void> _showEditDialog(BuildContext context, String title, String memo, DateTime diaryDate) async {
+    final titleController = TextEditingController(text: title);
+    final memoController = TextEditingController(text: memo);
+
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Edit'),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                TextField(
+                  controller: titleController,
+                  decoration: InputDecoration(hintText: 'Title'),
+                ),
+                TextField(
+                  controller: memoController,
+                  decoration: InputDecoration(hintText: 'Memo'),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Save'),
+              onPressed: () {
+                // データを保存する処理を追加
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     DateTime today = DateTime.now();
@@ -59,6 +103,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
                         title: 'Title for ${date.month}/${date.day}',
                         memo: 'Memo for ${date.month}/${date.day}',
                         diaryDate: date,
+                        onTap: () => _showEditDialog(context, 'Title for ${date.month}/${date.day}', 'Memo for ${date.month}/${date.day}', date),
                       ),
                     ),
                   ),
