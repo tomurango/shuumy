@@ -2,17 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:shuumy/pages/daily_report_page.dart';
 import 'package:shuumy/pages/challenge_page.dart';
 import 'package:shuumy/pages/setting_page.dart';
-import 'package:shuumy/components/tutorial_dialog.dart'; 
+import 'package:shuumy/components/tutorial_dialog.dart';
 
 // firebase 関連ライブラリ
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
 // その他ライブラリ
+// tutorial表示制御
 import 'package:shared_preferences/shared_preferences.dart';
+// user情報管理
+import 'package:shuumy/auth_notifier.dart';
+import 'package:provider/provider.dart';
 
-
-void main() async{
+void main() async {
   // Firebaseなどの非同期処理を待機するための記述
   WidgetsFlutterBinding.ensureInitialized();
   // Firebase 初期化
@@ -20,11 +23,16 @@ void main() async{
     options: DefaultFirebaseOptions.currentPlatform,
   );
   // アプリ開始
-  runApp(const MyApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => AuthNotifier(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
@@ -40,7 +48,7 @@ class MyApp extends StatelessWidget {
 }
 
 class MainPages extends StatefulWidget {
-  const MainPages({super.key, required this.title});
+  const MainPages({Key? key, required this.title}) : super(key: key);
 
   final String title;
 
@@ -65,13 +73,6 @@ class _MainPagesState extends State<MainPages> {
         title: Text(pageTitles[selectedIndex]),
       ),
       body: pages[selectedIndex],
-      /*
-      floatingActionButton: FloatingActionButton(
-        onPressed: ,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ),
-      */
       bottomNavigationBar: BottomNavigationBar(
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.event), label: '日報'),
@@ -111,3 +112,4 @@ class _MainPagesState extends State<MainPages> {
     }
   }
 }
+
