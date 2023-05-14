@@ -7,6 +7,10 @@ import 'package:shuumy/components/tutorial_dialog.dart';
 // firebase 関連ライブラリ
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+/*
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+*/
 
 // その他ライブラリ
 // tutorial表示制御
@@ -71,6 +75,38 @@ class _MainPagesState extends State<MainPages> {
     return Scaffold(
       appBar: AppBar(
         title: Text(pageTitles[selectedIndex]),
+        actions: [
+          Consumer<AuthNotifier>(
+            builder: (context, authNotifier, _) {
+              final user = authNotifier.user;
+              if (user == null || user.isAnonymous) {
+                // 匿名ログイン時のアイコン
+                return TextButton.icon(
+                  onPressed: () => _showLoginDialog(context),
+                  icon: Icon(Icons.person),
+                  label: Text('ログイン'),
+                  style: TextButton.styleFrom(
+                    primary: Colors.white,
+                  ),
+                );
+              }  else if (user.photoURL != null) {
+                // Googleログイン時のアイコン
+                return IconButton(
+                  icon: CircleAvatar(
+                    backgroundImage: NetworkImage(user.photoURL!),
+                  ),
+                  onPressed: () => _showLoginDialog(context),
+                );
+              } else {
+                // メールアドレスログイン時のアイコン
+                return IconButton(
+                  icon: Icon(Icons.person),
+                  onPressed: () => _showLoginDialog(context),
+                );
+              }
+            },
+          ),
+        ],
       ),
       body: pages[selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
@@ -111,5 +147,147 @@ class _MainPagesState extends State<MainPages> {
       });
     }
   }
+
+  void _showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('ログイン方法を選択'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextButton(
+              child: Text('Googleログイン'),
+              /*onPressed: () {
+                Navigator.pop(context);
+                _signInWithGoogle();
+              },*/
+              onPressed: () {
+                // ここでAuthNotifierのインスタンスからsignInWithGoogleを呼び出します
+                Provider.of<AuthNotifier>(context, listen: false)
+                    .signInWithGoogle();
+                Navigator.pop(context);
+              },
+            ),
+            TextButton(
+              child: Text('メールアドレスでログイン'),
+              onPressed: () {
+                Navigator.pop(context);
+                // メールアドレスでログインする処理を実装
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /*
+  Future<void> _signInWithGoogle() async {
+    try {
+      final googleSignIn = GoogleSignIn();
+      final googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) return;
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      print(e);
+    }
+  }
+  */
 }
 
+/*
+// ログインについて
+class LoginStatus extends StatefulWidget {
+  @override
+  _LoginStatusState createState() => _LoginStatusState();
+}
+
+class _LoginStatusState extends State<LoginStatus> {
+  FirebaseAuth auth = FirebaseAuth.instance;
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: auth.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return CircularProgressIndicator();
+        }
+
+        final user = snapshot.data;
+
+        if (user == null) {
+          return TextButton(
+            onPressed: () => _showLoginDialog(context),
+            child: Text('ログイン'),
+          );
+        } else {
+          return Row(
+            children: [
+              CircleAvatar(
+                backgroundImage: NetworkImage(user.photoURL ?? ''),
+              ),
+              SizedBox(width: 8),
+              TextButton(
+                onPressed: () => auth.signOut(),
+                child: Text('ログアウト'),
+              ),
+            ],
+          );
+        }
+      },
+    );
+  }
+
+  void _showLoginDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('ログイン方法を選択'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ElevatedButton(
+              onPressed: _signInWithGoogle,
+              child: Text('Googleでログイン'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // TODO: メールアドレスでのログイン処理を実装
+              },
+              child: Text('メールアドレスでログイン'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      final googleSignIn = GoogleSignIn();
+      final googleUser = await googleSignIn.signIn();
+
+      if (googleUser == null) return;
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+    } catch (e) {
+      print(e);
+    }
+  }
+}*/

@@ -41,6 +41,7 @@ dependencies:
   firebase_auth: "^4.4.2" # Firebase auth を使用する場合
   shared_preferences: ^2.1.0
   provider: ^6.0.5 # アプリ全体でユーザ情報を参照するためのパッケージ
+  google_sign_in: ^6.1.0
 
 dev_dependencies:
   flutter_test:
