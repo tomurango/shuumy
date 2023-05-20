@@ -66,19 +66,53 @@ class _DailyReportPageState extends State<DailyReportPage> {
     );
   }
 
-  Future<List<Report>> _fetchReports() async {
+  /*Future<List<Report>> _fetchReports() async {
     if (_user == null) {
       return [];
     }
+    // 過去７日間の日報を取得する
+    final startAt = DateTime.now().subtract(Duration(days: 7));
+    final endAt = DateTime.now().add(Duration(days: 1));
     final querySnapshot = await FirebaseFirestore.instance
         .collection('users')
         .doc(_user?.uid)
         .collection('reports')
+        .where('userId', isEqualTo: _user!.uid)
+        .where('diaryDate', isGreaterThanOrEqualTo: startAt)
+        .where('diaryDate', isLessThanOrEqualTo: endAt)
+        .orderBy('diaryDate', descending: true)
         .get();
     return querySnapshot.docs.map((doc) => Report.fromDocument(doc)).toList();
+  }*/
+
+  Future<List<Report>> _fetchReports() async {
+    if (_user == null) {
+      return [];
+    }
+
+    // 過去７日間の日報を取得する
+    List<Report> reports = List.filled(7, Report(id: '', title: '未提出', memo: '記載なし', diaryDate: Timestamp.now())); // デフォルトのリストを作成
+    DateTime now = DateTime.now();
+    DateTime startDate = DateTime(now.year, now.month, now.day - 6); // 7日前の日付を取得
+    final querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .doc(_user?.uid)
+        .collection('reports')
+        .where('diaryDate', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .orderBy('diaryDate', descending: true)
+        .get();
+
+    querySnapshot.docs.forEach((doc) {
+      Report report = Report.fromDocument(doc);
+      DateTime reportDate = report.diaryDate.toDate();
+      int daysAgo = DateTime.now().difference(reportDate).inDays;
+      reports[daysAgo] = report; // 適切な位置にレポートを挿入
+    });
+
+    return reports;
   }
 
-  Widget _buildReportList() {
+  /*Widget _buildReportList() {
     return FutureBuilder<List<Report>>(
       future: _fetchReports(),
       builder: (BuildContext context, AsyncSnapshot<List<Report>> snapshot) {
@@ -86,6 +120,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
           return Center(child: CircularProgressIndicator());
         }
 
+        // エラーが発生した場合とデータが空の場合は日報のリストを空欄の状態で表示し、各種カードを配置する
         if (snapshot.hasError) {
           return Center(child: Text('Error: ${snapshot.error}'));
         }
@@ -95,13 +130,36 @@ class _DailyReportPageState extends State<DailyReportPage> {
         }
 
         List<Report> reports = snapshot.data!;
+        // 日報のリストを過去７日間分表示する
+        return Column(
+          children: reports.map((report) => _buildReportCard(context, report)).toList(),
+        );
+      },
+    );
+  }*/
+
+  Widget _buildReportList() {
+    return FutureBuilder<List<Report>>(
+      future: _fetchReports(),
+      builder: (BuildContext context, AsyncSnapshot<List<Report>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        // データが空の場合は日報のリストを空欄の状態で表示し、各種カードを配置する
+        // エラーが発生した場合はエラーを表示する
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        List<Report> reports = snapshot.data!;
+        // 日報のリストを過去７日間分表示する
         return Column(
           children: reports.map((report) => _buildReportCard(context, report)).toList(),
         );
       },
     );
   }
-
 
   Widget _buildReportCard(BuildContext context, Report report) {
     DateTime date = report.diaryDate.toDate();
