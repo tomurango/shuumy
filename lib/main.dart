@@ -137,6 +137,7 @@ class _MainPagesState extends State<MainPages> {
     _checkTutorialShown();
   }
 
+  /*
   Future<void> _checkTutorialShown() async {
     final prefs = await SharedPreferences.getInstance();
     final shown = prefs.getBool('tutorial_shown') ?? false;
@@ -147,6 +148,20 @@ class _MainPagesState extends State<MainPages> {
       });
     }
   }
+  */
+
+  Future<void> _checkTutorialShown() async {
+    final prefs = await SharedPreferences.getInstance();
+    final shown = prefs.getBool('tutorial_shown') ?? false;
+
+    if (!shown) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        TutorialDialog.show(context); // ここで直接呼び出す
+      });
+      await prefs.setBool('tutorial_shown', true); // チュートリアルが表示されたことを記録
+    }
+  }
+
 
   void _showLoginDialog(BuildContext context) {
     showDialog(

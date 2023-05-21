@@ -85,13 +85,22 @@ class _DailyReportPageState extends State<DailyReportPage> {
     return querySnapshot.docs.map((doc) => Report.fromDocument(doc)).toList();
   }*/
 
+  /*
   Future<List<Report>> _fetchReports() async {
     if (_user == null) {
       return [];
     }
 
+    // デフォルトのリストを作成
+    List<Report> reports = List.generate(7, (index) {
+      return Report(
+        id: '', 
+        title: '未提出', 
+        memo: '記載なし', 
+        diaryDate: Timestamp.fromDate(DateTime.now().subtract(Duration(days: index)))
+      );
+    });
     // 過去７日間の日報を取得する
-    List<Report> reports = List.filled(7, Report(id: '', title: '未提出', memo: '記載なし', diaryDate: Timestamp.now())); // デフォルトのリストを作成
     DateTime now = DateTime.now();
     DateTime startDate = DateTime(now.year, now.month, now.day - 6); // 7日前の日付を取得
     final querySnapshot = await FirebaseFirestore.instance
@@ -110,6 +119,43 @@ class _DailyReportPageState extends State<DailyReportPage> {
     });
 
     return reports;
+  }
+  */
+
+  Stream<List<Report>> _fetchReports() {
+    if (_user == null) {
+      return Stream.value([]);
+    }
+
+    // 過去７日間の日報を取得する
+    DateTime now = DateTime.now();
+    DateTime startDate = DateTime(now.year, now.month, now.day - 6); // 7日前の日付を取得
+    return FirebaseFirestore.instance
+        .collection('users')
+        .doc(_user?.uid)
+        .collection('reports')
+        .where('diaryDate', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
+        .orderBy('diaryDate', descending: true)
+        .snapshots()
+        .map((querySnapshot) {
+      List<Report> reports = List.generate(7, (index) {
+        return Report(
+          id: '', 
+          title: '未提出', 
+          memo: '記載なし', 
+          diaryDate: Timestamp.fromDate(DateTime.now().subtract(Duration(days: index)))
+        );
+      });
+
+      querySnapshot.docs.forEach((doc) {
+        Report report = Report.fromDocument(doc);
+        DateTime reportDate = report.diaryDate.toDate();
+        int daysAgo = DateTime.now().difference(reportDate).inDays;
+        reports[daysAgo] = report; // 適切な位置にレポートを挿入
+      });
+
+      return reports;
+    });
   }
 
   /*Widget _buildReportList() {
@@ -138,9 +184,34 @@ class _DailyReportPageState extends State<DailyReportPage> {
     );
   }*/
 
+  /*
   Widget _buildReportList() {
     return FutureBuilder<List<Report>>(
       future: _fetchReports(),
+      builder: (BuildContext context, AsyncSnapshot<List<Report>> snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        }
+
+        // データが空の場合は日報のリストを空欄の状態で表示し、各種カードを配置する
+        // エラーが発生した場合はエラーを表示する
+        if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        }
+
+        List<Report> reports = snapshot.data!;
+        // 日報のリストを過去７日間分表示する
+        return Column(
+          children: reports.map((report) => _buildReportCard(context, report)).toList(),
+        );
+      },
+    );
+  }
+  */
+
+  Widget _buildReportList() {
+    return StreamBuilder<List<Report>>(
+      stream: _fetchReports(),  // use stream here
       builder: (BuildContext context, AsyncSnapshot<List<Report>> snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -164,6 +235,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
   Widget _buildReportCard(BuildContext context, Report report) {
     DateTime date = report.diaryDate.toDate();
     bool isEditable = _isEditable(date);
+    Color color = _getColor(date);
     return Row(
       children: [
         Expanded(
@@ -176,7 +248,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
                 children: <Widget>[
                   isEditable
                       ? Container(
-                          color: Colors.teal,
+                          color: color,
                           height: 56,
                           width: 56,
                         )
@@ -211,6 +283,17 @@ class _DailyReportPageState extends State<DailyReportPage> {
     DateTime today = DateTime.now();
     return date.day == today.day ||
         (date.day == today.subtract(Duration(days: 1)).day && today.hour < 12);
+  }
+
+  Color _getColor(DateTime date) {
+    DateTime today = DateTime.now();
+    if (date.day == today.day) {
+        return Colors.teal;
+    } else if (date.day == today.subtract(Duration(days: 1)).day && today.hour < 12) {
+        return Colors.teal[200]!;
+    } else {
+        return Colors.transparent;
+    }
   }
 
   @override
