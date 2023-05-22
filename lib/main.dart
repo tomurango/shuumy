@@ -137,19 +137,6 @@ class _MainPagesState extends State<MainPages> {
     _checkTutorialShown();
   }
 
-  /*
-  Future<void> _checkTutorialShown() async {
-    final prefs = await SharedPreferences.getInstance();
-    final shown = prefs.getBool('tutorial_shown') ?? false;
-
-    if (!shown) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
-        TutorialDialog.show(context); // ここで直接呼び出す
-      });
-    }
-  }
-  */
-
   Future<void> _checkTutorialShown() async {
     final prefs = await SharedPreferences.getInstance();
     final shown = prefs.getBool('tutorial_shown') ?? false;
@@ -171,12 +158,9 @@ class _MainPagesState extends State<MainPages> {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // googleログインボタン
             TextButton(
               child: Text('Googleログイン'),
-              /*onPressed: () {
-                Navigator.pop(context);
-                _signInWithGoogle();
-              },*/
               onPressed: () {
                 // ここでAuthNotifierのインスタンスからsignInWithGoogleを呼び出します
                 Provider.of<AuthNotifier>(context, listen: false)
@@ -184,6 +168,7 @@ class _MainPagesState extends State<MainPages> {
                 Navigator.pop(context);
               },
             ),
+            // メールログインボタン
             TextButton(
               child: Text('メールアドレスでログイン'),
               onPressed: () {
@@ -191,118 +176,23 @@ class _MainPagesState extends State<MainPages> {
                 // メールアドレスでログインする処理を実装
               },
             ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  /*
-  Future<void> _signInWithGoogle() async {
-    try {
-      final googleSignIn = GoogleSignIn();
-      final googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) return;
-
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
-      print(e);
-    }
-  }
-  */
-}
-
-/*
-// ログインについて
-class LoginStatus extends StatefulWidget {
-  @override
-  _LoginStatusState createState() => _LoginStatusState();
-}
-
-class _LoginStatusState extends State<LoginStatus> {
-  FirebaseAuth auth = FirebaseAuth.instance;
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<User?>(
-      stream: auth.authStateChanges(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return CircularProgressIndicator();
-        }
-
-        final user = snapshot.data;
-
-        if (user == null) {
-          return TextButton(
-            onPressed: () => _showLoginDialog(context),
-            child: Text('ログイン'),
-          );
-        } else {
-          return Row(
-            children: [
-              CircleAvatar(
-                backgroundImage: NetworkImage(user.photoURL ?? ''),
-              ),
-              SizedBox(width: 8),
-              TextButton(
-                onPressed: () => auth.signOut(),
-                child: Text('ログアウト'),
-              ),
-            ],
-          );
-        }
-      },
-    );
-  }
-
-  void _showLoginDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('ログイン方法を選択'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ElevatedButton(
-              onPressed: _signInWithGoogle,
-              child: Text('Googleでログイン'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                // TODO: メールアドレスでのログイン処理を実装
+            // ログアウトボタン
+            Consumer<AuthNotifier>(
+              builder: (context, auth, child) {
+                return auth.user != null && !auth.user!.isAnonymous
+                  ? TextButton(
+                      child: Text('ログアウト'),
+                      onPressed: () {
+                        auth.signOut();
+                        Navigator.pop(context);
+                      },
+                    )
+                  : SizedBox.shrink();  // ログインしていない、または匿名ユーザーの場合は何も表示しない
               },
-              child: Text('メールアドレスでログイン'),
             ),
           ],
         ),
       ),
     );
   }
-
-  Future<void> _signInWithGoogle() async {
-    try {
-      final googleSignIn = GoogleSignIn();
-      final googleUser = await googleSignIn.signIn();
-
-      if (googleUser == null) return;
-
-      final googleAuth = await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      await FirebaseAuth.instance.signInWithCredential(credential);
-    } catch (e) {
-      print(e);
-    }
-  }
-}*/
+}

@@ -44,4 +44,10 @@ class AuthNotifier extends ChangeNotifier {
       print(e);
     }
   }
+
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+    _user = null;  // ログアウトしたので、ユーザー情報もnullに更新します。
+    notifyListeners();  // 状態が変化したのでリスナーに通知します。
+  }
 }
