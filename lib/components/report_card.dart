@@ -50,11 +50,6 @@ class ReportCard extends StatelessWidget {
         //margin: const EdgeInsets.all(30),
         //elevation: 8, // 影の離れ具合
         shadowColor: Colors.black ,// 影の色
-        /*
-        shape: RoundedRectangleBorder( // 枠線を変更できる
-          borderRadius: BorderRadius.circular(10),
-        ),
-        */
       ),
     );
   }

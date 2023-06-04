@@ -138,23 +138,4 @@ class _MainPagesState extends State<MainPages> {
       ),
     );
   }
-
-  // tutorial表示可否確認用
-  /*
-  @override
-  void initState() {
-    super.initState();
-    _checkTutorialShown();
-  }
-  Future<void> _checkTutorialShown() async {
-    final prefs = await SharedPreferences.getInstance();
-    final shown = prefs.getBool('tutorial_shown') ?? false;
-
-    if (!shown) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
-        TutorialDialog.show(context); // ここで直接呼び出す
-      });
-      await prefs.setBool('tutorial_shown', true); // チュートリアルが表示されたことを記録
-    }
-  }*/
 }

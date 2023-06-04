@@ -12,19 +12,6 @@ class AuthNotifier extends ChangeNotifier {
     initializeUser();
   }
 
-  /*
-  Future<void> initializeUser() async {
-    _user = _auth.currentUser;
-
-    if (_user == null) {
-      UserCredential userCredential = await _auth.signInAnonymously();
-      _user = userCredential.user;
-    }
-
-    notifyListeners();
-  }
-  */
-  
   Future<void> initializeUser() async {
     _user = _auth.currentUser;
     notifyListeners();
