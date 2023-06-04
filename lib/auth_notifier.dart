@@ -12,6 +12,7 @@ class AuthNotifier extends ChangeNotifier {
     initializeUser();
   }
 
+  /*
   Future<void> initializeUser() async {
     _user = _auth.currentUser;
 
@@ -21,6 +22,13 @@ class AuthNotifier extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+  */
+  
+  Future<void> initializeUser() async {
+    _user = _auth.currentUser;
+    notifyListeners();
+    return;
   }
 
   Future<void> signInWithGoogle() async {
