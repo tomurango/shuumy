@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shuumy/auth_notifier.dart';
 import 'package:provider/provider.dart';
+import 'package:intl/intl.dart';
 
 class DailyReportPage extends StatefulWidget {
   @override
@@ -23,7 +24,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
     _user = authNotifier.user;
   }
 
-  Future<void> _showEditDialog(BuildContext context, String title, String memo, DateTime diaryDate) async {
+  Future<void> _showEditDialog(BuildContext context, String title, String memo, DateTime diaryDate, String reportId) async {
     final titleController = TextEditingController(text: title);
     final memoController = TextEditingController(text: memo);
 
@@ -55,9 +56,28 @@ class _DailyReportPageState extends State<DailyReportPage> {
             ),
             TextButton(
               child: const Text('Save'),
-              onPressed: () {
-                // データを保存する処理を追加
-                Navigator.of(context).pop();
+              onPressed: () async {
+                try {
+                  // データを保存する処理を追加
+                  //String docId = DateFormat('yyyyMMdd').format(diaryDate);
+                  // firestoreに保存する
+                  // ドキュメントIDは年月日の情報を文字列にしたものとする
+                  await FirebaseFirestore.instance
+                      .collection('users')
+                      .doc(_user?.uid)
+                      .collection('reports')
+                      .doc(reportId)
+                      .set({
+                        'title': titleController.text,
+                        'memo': memoController.text,
+                        'diaryDate': Timestamp.fromDate(DateTime.now()),
+                      });
+                  Navigator.of(context).pop();
+                } catch (e) {
+                  // print the exception to the console or show it in the UI
+                  print("Failed to save the data: $e");
+                  // Optionally, you could add a dialog here to inform the user about the error
+                }
               },
             ),
           ],
@@ -84,10 +104,10 @@ class _DailyReportPageState extends State<DailyReportPage> {
         .map((querySnapshot) {
       List<Report> reports = List.generate(7, (index) {
         return Report(
-          id: '', 
+          id: DateFormat('yyyyMMdd').format(DateTime.now().subtract(Duration(days: index))), 
           title: '未提出', 
           memo: '記載なし', 
-          diaryDate: Timestamp.fromDate(DateTime.now().subtract(Duration(days: index)))
+          diaryDate: Timestamp.fromDate(DateTime.now().subtract(Duration(days: index))),
         );
       });
 
@@ -127,6 +147,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
 
   Widget _buildReportCard(BuildContext context, Report report) {
     DateTime date = report.diaryDate.toDate();
+    String reportId = report.id;
     bool isEditable = _isEditable(date);
     Color color = _getColor(date);
     return Row(
@@ -162,7 +183,7 @@ class _DailyReportPageState extends State<DailyReportPage> {
                 memo: report.memo,
                 diaryDate: date,
                 onTap: isEditable
-                  ? () => _showEditDialog(context, report.title, report.memo, date)
+                  ? () => _showEditDialog(context, report.title, report.memo, date, reportId)
                   : () {},
               ),
             ),
@@ -172,22 +193,30 @@ class _DailyReportPageState extends State<DailyReportPage> {
     );
   }
 
+  // 日報が編集可能かどうかを判定する
   bool _isEditable(DateTime date) {
+    // 当日中のみ編集可能
     DateTime today = DateTime.now();
-    return date.day == today.day ||
-        (date.day == today.subtract(Duration(days: 1)).day && today.hour < 12);
+    return date.day == today.day;
   }
 
+  // 日報が編集可能な場合は色をつける
   Color _getColor(DateTime date) {
     DateTime today = DateTime.now();
     if (date.day == today.day) {
-        return Colors.teal;
-    } else if (date.day == today.subtract(Duration(days: 1)).day && today.hour < 12) {
-        return Colors.teal[200]!;
+      return Colors.teal;
     } else {
-        return Colors.transparent;
+      return Colors.transparent;
     }
   }
+
+  // 日報の作成日時を年月日のみにする
+  /*
+  DateTime _toDateTime(Timestamp timestamp) {
+    DateTime date = timestamp.toDate();
+    return DateTime(date.year, date.month, date.day);
+  }
+  */
 
   @override
   Widget build(BuildContext context) {

@@ -5,6 +5,7 @@ class Report {
   final String id;
   final String title;
   final String memo;
+  // ここは変動するかな
   final Timestamp diaryDate;
 
   Report({
