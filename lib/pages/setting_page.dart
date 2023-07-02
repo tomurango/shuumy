@@ -46,6 +46,12 @@ class _SettingPageState extends State<SettingPage> {
             // チュートリアル確認画面へ遷移
           },
         ),
+        ListTile(
+          title: Text('お問い合わせ'),
+          onTap: () {
+            // チュートリアル確認画面へ遷移
+          },
+        ),
       ],
     );
   }
