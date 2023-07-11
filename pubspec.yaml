@@ -43,6 +43,7 @@ dependencies:
   provider: ^6.0.5 # アプリ全体でユーザ情報を参照するためのパッケージ
   google_sign_in: ^6.1.0
   intl: ^0.17.0 #フォーマットを使用するためのもの
+  flutter_stripe: ^9.2.2
 
 dev_dependencies:
   flutter_test:
