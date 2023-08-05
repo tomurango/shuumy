@@ -16,6 +16,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 // user情報管理
 import 'package:shuumy/auth_notifier.dart';
 import 'package:provider/provider.dart';
+// stripe
+import 'package:flutter_stripe/flutter_stripe.dart';
+import 'package:stripe_platform_interface/stripe_platform_interface.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,6 +30,9 @@ void main() async {
   final authNotifier = AuthNotifier();
   // ユーザーの初期化を待つ
   await authNotifier.initializeUser();
+  // stripeの初期化
+  Stripe.publishableKey = const String.fromEnvironment('STRIPE_PK');
+
   runApp(
     ChangeNotifierProvider(
       create: (context) => authNotifier,
