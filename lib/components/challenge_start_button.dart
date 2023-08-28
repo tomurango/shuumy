@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-// import 'package:stripe_platform_interface/stripe_platform_interface.dart';
-// import 'package:stripe_payment/stripe_payment.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 import 'dart:developer';
@@ -16,8 +14,8 @@ class ChallengeStartButton extends HookWidget {
       onPressed: () async{
         try {
           // 1. Cloud Functions 上で PaymentIntent を作成
-          final callable = FirebaseFunctions.instance
-              .httpsCallable('createPaymentIntent');
+          FirebaseFunctions functions = FirebaseFunctions.instance;
+          final callable = functions.httpsCallable('createPaymentIntent');
           final result = await callable.call();
           final data = result.data;
 
