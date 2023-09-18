@@ -43,9 +43,7 @@ dependencies:
   provider: ^6.0.5 # アプリ全体でユーザ情報を参照するためのパッケージ
   google_sign_in: ^6.1.0
   intl: ^0.17.0 #フォーマットを使用するためのもの
-  flutter_stripe: ^9.2.2
-  flutter_hooks: ^0.18.6
-  cloud_functions: ^4.3.4
+  purchases_flutter: ^5.6.5 #課金機能
 
 dev_dependencies:
   flutter_test:
