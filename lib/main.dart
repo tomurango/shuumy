@@ -19,8 +19,6 @@ import 'package:provider/provider.dart';
 // stripe
 import 'package:flutter_stripe/flutter_stripe.dart';
 import 'package:stripe_platform_interface/stripe_platform_interface.dart';
-import 'package:flutter/foundation.dart';
-import 'package:cloud_functions/cloud_functions.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,10 +32,6 @@ void main() async {
   await authNotifier.initializeUser();
   // stripeの初期化
   Stripe.publishableKey = const String.fromEnvironment('STRIPE_PK');
-  // 本番環境の場合は emulator を使わない
-  if (kDebugMode) {
-    FirebaseFunctions.instance.useFunctionsEmulator('localhost', 5001);
-  }
 
   runApp(
     ChangeNotifierProvider(
